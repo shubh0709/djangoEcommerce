@@ -1,34 +1,89 @@
-# models.py
+import uuid
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+# Create your models here.
 
 
-class CustomUserManager(BaseUserManager):
-    def create_user(self, phone_number, password=None, **extra_fields):
-        if not phone_number:
-            raise ValueError('The Phone Number field must be set')
+class BaseModelClass(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-        user = self.model(phone_number=phone_number, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, phone_number, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(phone_number, password, **extra_fields)
+    class Meta:
+        abstract = True
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=20, unique=True)
-    employment_history = models.CharField(max_length=255)
-    education = models.CharField(max_length=255)
-    skills = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+class Order(BaseModelClass):
+    userId = models.ForeignKey(to=User, on_delete=models.set_NULL, null=True)
+    paymentMethod = models.CharField(max_length=200, blank=True, null=True)
+    taxPrice = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True)
+    shippingPrice = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True)
+    totalPrice = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True)
+    isPaid = models.BooleanField(default=False)
+    paidAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+    isDelivered = models.BooleanField(default=False)
+    deliveredAt = models.DateTimeField(
+        auto_now_add=False, null=True, blank=True)
 
-    USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['employment_history', 'education', 'skills']
+    def __str__(self):
+        return self.id
 
-    objects = CustomUserManager()
+
+class ShippingAddress(BaseModelClass):
+    order = models.OneToOneField(to=Order, on_delete=models.CASCADE)
+    address = models.CharField(max_length=50)
+    city = models.CharField(max_length=50)
+    postalCode = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    shippingPrice = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return self.address
+
+
+class User(BaseModelClass):
+    username = models.CharField(max_length=50)
+    firstName = models.CharField(max_length=50)
+    lastName = models.CharField(max_length=50)
+    email = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    is_superuser = models.BooleanField()
+
+
+class OrderItem(BaseModelClass):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=200)
+    qty = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
+    image = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class Product(BaseModelClass):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=200)
+    image = models.ImageField(max_length=50, default='/placeholder.png')
+    brand = models.CharField(max_length=200)
+    category = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    rating = models.models.DecimalField(max_digits=7)
+    numReviews = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
+    countinStock = models.IntegerField(default=0)
+
+
+class Review(BaseModelClass):
+    user = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=50)
+    rating = models.IntegerField(default=0)
+    comment = models.TextField(null=True, blank=True)
