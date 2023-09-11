@@ -4,29 +4,23 @@ from django.http import HttpResponse
 def index(request):
     return HttpResponse("user page")
 
-def login(request):
+def registerUser(request):
     return HttpResponse("user page")
 
-def register(request):
+def getUserProfile(request):
     return HttpResponse("user page")
 
-def profile(request):
+def updateUserProfile(request):
     return HttpResponse("user page")
 
-def (request):
+def getUsers(request):
     return HttpResponse("user page")
 
-def index(request):
+def getUserById(request):
     return HttpResponse("user page")
 
-def index(request):
+def updateUser(request):
     return HttpResponse("user page")
 
-def index(request):
-    return HttpResponse("user page")
-
-def index(request):
-    return HttpResponse("user page")
-
-def index(request):
+def deleteUser(request):
     return HttpResponse("user page")

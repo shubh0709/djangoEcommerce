@@ -5,11 +5,11 @@ def index(request):
     return HttpResponse("product page")
 
 
-def create(request):
+def createProduct(request):
     return HttpResponse("product page")
 
 
-def upload(request):
+def uploadImage(request):
     return HttpResponse("product page")
 
 
@@ -18,6 +18,10 @@ def createProductReview(request):
 
 
 def getTopProducts(request):
+    return HttpResponse("product page")
+
+
+def getProducts(request):
     return HttpResponse("product page")
 
 
