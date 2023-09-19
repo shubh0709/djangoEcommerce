@@ -1,37 +1,41 @@
 from django.http import HttpResponse
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 
 def index(request):
     return HttpResponse("product page")
 
 
-def createProduct(request):
+def create_product(request):
     return HttpResponse("product page")
 
 
-def uploadImage(request):
+def upload_image(request):
     return HttpResponse("product page")
 
 
-def createProductReview(request):
+def create_product_review(request):
     return HttpResponse("product page")
 
 
-def getTopProducts(request):
+def get_top_products(request:Request):
     return HttpResponse("product page")
 
 
-def getProducts(request):
+@api_view(http_method_names=["GET"])
+def get_products(request: Request):
     return HttpResponse("product page")
 
 
-def getProduct(request):
+def get_product(request):
     return HttpResponse("product page")
 
 
-def updateProduct(request):
+def update_product(request):
     return HttpResponse("product page")
 
 
-def deleteProduct(request):
+def delete_product(request):
     return HttpResponse("product page")

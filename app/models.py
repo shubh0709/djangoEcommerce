@@ -14,8 +14,19 @@ class BaseModelClass(models.Model):
         abstract = True
 
 
+class User(BaseModelClass):
+    username = models.CharField(max_length=50)
+    firstName = models.CharField(max_length=50)
+    lastName = models.CharField(max_length=50)
+    email = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    is_superuser = models.BooleanField()
+
+
 class Order(BaseModelClass):
-    userId = models.ForeignKey(to=User, on_delete=models.set_NULL, null=True)
+    userId = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     paymentMethod = models.CharField(max_length=200, blank=True, null=True)
     taxPrice = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
@@ -45,19 +56,21 @@ class ShippingAddress(BaseModelClass):
         return self.address
 
 
-class User(BaseModelClass):
-    username = models.CharField(max_length=50)
-    firstName = models.CharField(max_length=50)
-    lastName = models.CharField(max_length=50)
-    email = models.CharField(max_length=50)
-    password = models.CharField(max_length=50)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    is_superuser = models.BooleanField()
+class Product(BaseModelClass):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=200)
+    image = models.ImageField(max_length=50, default='/placeholder.png')
+    brand = models.CharField(max_length=200)
+    category = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    rating = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    numReviews = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
+    countinStock = models.IntegerField(default=0)
 
 
 class OrderItem(BaseModelClass):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(to=Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200)
     qty = models.IntegerField(default=0)
@@ -68,22 +81,9 @@ class OrderItem(BaseModelClass):
         return str(self.name)
 
 
-class Product(BaseModelClass):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=200)
-    image = models.ImageField(max_length=50, default='/placeholder.png')
-    brand = models.CharField(max_length=200)
-    category = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
-    rating = models.models.DecimalField(max_digits=7)
-    numReviews = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
-    countinStock = models.IntegerField(default=0)
-
-
 class Review(BaseModelClass):
     user = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50)
-    rating = models.IntegerField(default=0)
+    rating = models.IntegerField(null=True, blank=True, default=0)
     comment = models.TextField(null=True, blank=True)
